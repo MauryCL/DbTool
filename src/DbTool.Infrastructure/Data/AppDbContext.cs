@@ -34,12 +34,20 @@ public class AppDbContext : IDisposable
 
     private static string GetDefaultDbPath()
     {
-        // Use AppContext.BaseDirectory which points to the executable directory
+        // Prioritize Environment.ProcessPath for single-file executables
+        var processPath = Environment.ProcessPath;
+        if (!string.IsNullOrEmpty(processPath))
+        {
+            var processDir = Path.GetDirectoryName(processPath);
+            if (!string.IsNullOrEmpty(processDir))
+            {
+                return Path.Combine(processDir, "config.db");
+            }
+        }
+        
+        // Fallback to AppContext.BaseDirectory
         var baseDir = AppContext.BaseDirectory;
-        
-        // Remove trailing slash if present
         baseDir = baseDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        
         return Path.Combine(baseDir, "config.db");
     }
 

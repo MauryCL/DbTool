@@ -6,10 +6,22 @@ using DbTool.Application.Settings;
 using DbTool.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 // Configure console encoding for Windows to support Unicode characters
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
+
+// Configure Serilog
+var logPath = Path.Combine(AppContext.BaseDirectory, "logs", "dbtool-.log");
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File(logPath, 
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+Log.Information("DbTool starting...");
 
 
 // Load configuration
@@ -158,6 +170,46 @@ dbCommand.AddCommand(dbAddCommand);
 dbCommand.AddCommand(dbListCommand);
 dbCommand.AddCommand(dbTestCommand);
 dbCommand.AddCommand(dbDeleteCommand);
+
+// info command
+var infoCommand = new Command("info", "Display configuration and paths information");
+infoCommand.SetHandler(() =>
+{
+    // Replicate logic from AppDbContext.GetDefaultDbPath
+    string configDbPath;
+    var processPath = Environment.ProcessPath;
+    if (!string.IsNullOrEmpty(processPath))
+    {
+        var processDir = Path.GetDirectoryName(processPath);
+        if (!string.IsNullOrEmpty(processDir))
+        {
+            configDbPath = Path.Combine(processDir, "config.db");
+        }
+        else
+        {
+             var baseDir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+             configDbPath = Path.Combine(baseDir, "config.db");
+        }
+    }
+    else
+    {
+         var baseDir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+         configDbPath = Path.Combine(baseDir, "config.db");
+    }
+
+    var logDir = Path.Combine(Path.GetDirectoryName(configDbPath) ?? AppContext.BaseDirectory, "logs");
+    
+    Console.WriteLine("\nDbTool Configuration:");
+    Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    Console.WriteLine($"  Executable:     {Environment.ProcessPath}");
+    Console.WriteLine($"  Config DB:      {configDbPath}");
+    Console.WriteLine($"  DB Exists:      {File.Exists(configDbPath)}");
+    Console.WriteLine($"  Log Directory:  {logDir}");
+    Console.WriteLine($"  Version:        0.1.2");
+    Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+});
+
+dbCommand.AddCommand(infoCommand);
 
 // Backup command
 var backupCommand = new Command("backup", "Create a database backup");
