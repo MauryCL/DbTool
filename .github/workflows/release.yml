@@ -109,18 +109,17 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R artifacts
 
+      - name: Move artifacts to root
+        run: |
+          find artifacts -name '*.zip' -exec mv {} . \;
+          ls -la *.zip
+
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           generate_release_notes: true
-          files: |
-            artifacts/DbTool-CLI-win-x64/*.zip
-            artifacts/DbTool-CLI-linux-x64/*.zip
-            artifacts/DbTool-CLI-osx-x64/*.zip
-            artifacts/DbTool-UI-win-x64/*.zip
-            artifacts/DbTool-UI-linux-x64/*.zip
-            artifacts/DbTool-UI-osx-x64/*.zip
-            artifacts/DbTool-UI-osx-arm64/*.zip
+          files: '*.zip'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
