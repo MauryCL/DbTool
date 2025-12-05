@@ -321,6 +321,8 @@ restoreCommand.SetHandler(async (dbName, backupFile, force) =>
             logger.Warning("\n⚠️  WARNING: This will restore the database '{DbName}' from:", dbName);
             logger.Warning("   {BackupFile}", backupFile);
             logger.Warning("\n   This operation will overwrite existing data!");
+            
+            // Use Console.Write/ReadLine for interactive user input (not logging)
             Console.Write($"\nContinue? (yes/N): ");
             
             var response = Console.ReadLine()?.Trim().ToLowerInvariant();
