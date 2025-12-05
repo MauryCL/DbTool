@@ -237,6 +237,40 @@ public class OracleProvider : IDatabaseProvider
 
 ---
 
+## 📦 Releases
+
+### Download Pre-built Binaries
+
+Pre-compiled binaries are available for download on the [Releases page](https://github.com/yourusername/DbTool/releases).
+
+**Available platforms**:
+- **CLI**: Windows (x64), Linux (x64), macOS (x64)
+- **UI**: Windows (x64), Linux (x64), macOS (x64, ARM64)
+
+Each release includes self-contained executables that don't require .NET to be installed.
+
+### Creating a New Release
+
+Releases are automatically created when you push a version tag:
+
+```bash
+# Create a new version tag
+git tag v1.0.0
+
+# Push the tag to GitHub
+git push origin v1.0.0
+```
+
+This will trigger the GitHub Actions workflow that:
+1. Builds the CLI and UI for all platforms
+2. Creates self-contained single-file executables
+3. Packages them as ZIP files
+4. Creates a draft release with all binaries attached
+
+After the workflow completes, you can edit the draft release notes and publish it.
+
+---
+
 ## 🚧 Roadmap
 
 - [x] Implement restore functionality ✅

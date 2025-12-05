@@ -1,0 +1,126 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build ${{ matrix.project }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          # CLI Builds
+          - project: CLI
+            runner: ubuntu-latest
+            os: win-x64
+            runtime: win-x64
+            output: DbTool.exe
+          - project: CLI
+            runner: ubuntu-latest
+            os: linux-x64
+            runtime: linux-x64
+            output: DbTool
+          - project: CLI
+            runner: ubuntu-latest
+            os: osx-x64
+            runtime: osx-x64
+            output: DbTool
+          
+          # UI Builds
+          - project: UI
+            runner: ubuntu-latest
+            os: win-x64
+            runtime: win-x64
+            output: DbTool.UI.exe
+          - project: UI
+            runner: ubuntu-latest
+            os: linux-x64
+            runtime: linux-x64
+            output: DbTool.UI
+          - project: UI
+            runner: ubuntu-latest
+            os: osx-x64
+            runtime: osx-x64
+            output: DbTool.UI
+          - project: UI
+            runner: ubuntu-latest
+            os: osx-arm64
+            runtime: osx-arm64
+            output: DbTool.UI
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build ${{ matrix.project }}
+        run: |
+          dotnet publish src/DbTool.${{ matrix.project }}/DbTool.${{ matrix.project }}.csproj \
+            -c Release \
+            -r ${{ matrix.runtime }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -p:EnableCompressionInSingleFile=true \
+            -o ./publish/${{ matrix.project }}-${{ matrix.os }}
+
+      - name: Create ZIP archive
+        run: |
+          cd ./publish/${{ matrix.project }}-${{ matrix.os }}
+          if [ "${{ matrix.os }}" = "win-x64" ]; then
+            7z a ../../DbTool-${{ matrix.project }}-${{ github.ref_name }}-${{ matrix.os }}.zip .
+          else
+            zip -r ../../DbTool-${{ matrix.project }}-${{ github.ref_name }}-${{ matrix.os }}.zip .
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DbTool-${{ matrix.project }}-${{ matrix.os }}
+          path: DbTool-${{ matrix.project }}-${{ github.ref_name }}-${{ matrix.os }}.zip
+          retention-days: 1
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            artifacts/DbTool-CLI-win-x64/*.zip
+            artifacts/DbTool-CLI-linux-x64/*.zip
+            artifacts/DbTool-CLI-osx-x64/*.zip
+            artifacts/DbTool-UI-win-x64/*.zip
+            artifacts/DbTool-UI-linux-x64/*.zip
+            artifacts/DbTool-UI-osx-x64/*.zip
+            artifacts/DbTool-UI-osx-arm64/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
