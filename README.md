@@ -5,6 +5,8 @@
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/mareasperez/DbTool)](https://github.com/mareasperez/DbTool/releases)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/mareasperez/DbTool/release.yml)](https://github.com/mareasperez/DbTool/actions)
 
 ---
 
@@ -44,7 +46,7 @@ dotnet run --project src/DbTool.CLI -- list-backups --db prod
 - ✅ **SQLite Configuration** - Local database for connection management
 - ✅ **Optional Compression** - Gzip compression (disabled by default)
 - ✅ **CLI & GUI** - Command-line interface and Avalonia desktop application
-- ✅ **GUI-Ready** - Core logic ready for future GUI implementation
+- ✅ **Automated Releases** - GitHub Actions workflow for multi-platform builds
 
 ---
 
@@ -140,7 +142,7 @@ DbTool/
 
 ```powershell
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/mareasperez/DbTool.git
 cd DbTool
 
 # Restore dependencies and build
@@ -241,7 +243,7 @@ public class OracleProvider : IDatabaseProvider
 
 ### Download Pre-built Binaries
 
-Pre-compiled binaries are available for download on the [Releases page](https://github.com/yourusername/DbTool/releases).
+Pre-compiled binaries are available for download on the [Releases page](https://github.com/mareasperez/DbTool/releases).
 
 **Available platforms**:
 - **CLI**: Windows (x64), Linux (x64), macOS (x64)
@@ -273,15 +275,27 @@ After the workflow completes, you can edit the draft release notes and publish i
 
 ## 🚧 Roadmap
 
-- [x] Implement restore functionality ✅
-- [ ] Add backup compression (gzip)
-- [ ] Implement backup encryption
-- [ ] Add scheduled backups
-- [ ] Build GUI (Avalonia/MAUI)
+### ✅ Completed
+- [x] Implement restore functionality
+- [x] Build GUI with Avalonia
+- [x] Automated releases (GitHub Actions)
+- [x] Multi-platform support (Windows, Linux, macOS)
+- [x] Self-contained single-file executables
+
+### 🔄 In Progress
+- [ ] Enhance UI features and user experience
+- [ ] Add more database providers (Oracle, MongoDB)
+
+### 📋 Planned
+- [ ] Backup compression (gzip)
+- [ ] Backup encryption
+- [ ] Scheduled backups
 - [ ] Cloud storage integration (Azure, AWS S3)
 - [ ] Backup retention policies
 - [ ] Email notifications
 - [ ] Backup verification
+- [ ] Incremental backups
+- [ ] Backup diff/comparison tools
 
 ---
 
@@ -316,7 +330,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For issues, questions, or suggestions, please [open an issue](https://github.com/yourusername/DbTool/issues).
+For issues, questions, or suggestions, please [open an issue](https://github.com/mareasperez/DbTool/issues).
 
 ---
 
