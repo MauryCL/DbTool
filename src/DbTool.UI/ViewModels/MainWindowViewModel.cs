@@ -74,8 +74,18 @@ public partial class MainWindowViewModel : ViewModelBase
         _dbConnectionService = dbConnectionService;
         _backupService = backupService;
         
-        // Load initial data
-        _ = LoadConnectionsAsync();
+        // Load initial data - wrapped to handle exceptions
+        Task.Run(async () =>
+        {
+            try
+            {
+                await LoadConnectionsAsync();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error loading initial data: {ex.Message}";
+            }
+        });
     }
 
     [RelayCommand]
@@ -336,7 +346,17 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (value != null)
         {
-            _ = LoadBackupsAsync();
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await LoadBackupsAsync().ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Error loading backups: {ex.Message}";
+                }
+            });
         }
     }
 

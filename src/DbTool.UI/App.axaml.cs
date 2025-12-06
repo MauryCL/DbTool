@@ -28,13 +28,19 @@ public partial class App : Avalonia.Application
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
             
+            // Ensure ServiceProvider is initialized
+            if (ServiceProvider == null)
+            {
+                throw new InvalidOperationException("ServiceProvider was not initialized. Call ConfigureServices before initializing the app.");
+            }
+            
             // Get services from DI container
-            var dbService = ServiceProvider?.GetRequiredService<IDatabaseConnectionService>();
-            var backupService = ServiceProvider?.GetRequiredService<IBackupService>();
+            var dbService = ServiceProvider.GetRequiredService<IDatabaseConnectionService>();
+            var backupService = ServiceProvider.GetRequiredService<IBackupService>();
             
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(dbService!, backupService!),
+                DataContext = new MainWindowViewModel(dbService, backupService),
             };
         }
 

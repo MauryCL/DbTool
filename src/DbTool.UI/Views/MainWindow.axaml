@@ -82,7 +82,7 @@
                                 <TextBox Text="{Binding Username}" Watermark="dbuser"/>
                                 
                                 <TextBlock Text="Password:" Margin="0,10,0,3"/>
-                                <TextBox Text="{Binding Password}" PasswordChar="●" Watermark="password"/>
+                                <TextBox Text="{Binding Password}" PasswordChar="*" Watermark="password"/>
                                 
                                 <Button Content="➕ Add Connection" 
                                         Command="{Binding AddConnectionCommand}" 
