@@ -2,6 +2,8 @@
 using System;
 using DbTool.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using DbTool.Application.Settings;
 
 namespace DbTool.UI;
 
@@ -26,7 +28,17 @@ sealed class Program
 
     private static void ConfigureServices()
     {
+        // Load configuration
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .Build();
+
         var services = new ServiceCollection();
+        
+        // Configure Options Pattern
+        services.Configure<DbToolSettings>(configuration.GetSection("DbTool"));
+        
         services.AddInfrastructure();
         App.ServiceProvider = services.BuildServiceProvider();
     }
